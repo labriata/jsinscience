@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Principal Components Analysis online</title>
+  <style>
+    h1    {      font-family: Calibri;    }
+    p    {      font-family: Calibri;    }
+    table    {      font-family: Calibri;      margin: 0px;      border-spacing: 1px;      border-radius: 10px;    }
+    textarea    {      border-radius: 5px;    }
+    button    {      border-radius: 5px;    }
+  </style>
+</head>
+
+<script type="application/x-javascript" src="js/lalolib.js"> </script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<body>
+
+  <table width=100%><tr>
+    <td width=10% align=left>
+      <b><font size=4><a href="http://labriataphd.altervista.org/" target="_blank">[HOME]</a></font></b><br>
+      <b><font size=4><a href="../index.html" target="_blank">[JSinScienceHOME]</a></font></b>
+    </td>
+    <td width=90%><center><h1>Principal Components Analysis Online</h1></td>
+  </tr></table>
+
+<b><font size=4 color="gray">A HTML/JavaScript tool to compute Principal Components Analysis using Singular Value Decomposition as implemented in <a href="http://mlweb.loria.fr/lalolab/lalolib.html" target="_blank">LALOlib</a>, displaying PC scatter plots, loading-per-variable line plots and eigenvalue bar plots with <a href="https://developers.google.com/chart/" target="_blank">Google Charts</a>.</font></b>
+<p>
+
+<div id="inputsdiv" style="display:block">
+<table bgcolor="#F0F0F0" style="width:100%"><tr><td>
+<table width=100%>
+<tr>
+<td style="width:50%" align=center><font color="red"><h3>Step 1: Paste numerical data here (columns=objects, rows=variables)</td>
+<td style="width:50%" align=center><font color="red"><h3>Step 2: Paste names here</td>
+</tr>
+</table>
+<tr>
+<td><center><b><font size=4 color="black"><i>Sample data set:</b></i>
+<font size=4 color="black"><button type="button" onclick="load_sample_data()" title="Load synthetic sample data with 12 objects of 3 classes, described by 20 variables">Load example</button><p>
+
+<table width=100%>
+<tr><td width=40%><center>
+<textarea id="datos1" rows=18 cols=70 style="width:95%" wrap="off" placeholder="Copy-paste your data here (variables x objects), or load it from a file with the button below (not all browsers allow file upload)"></textarea>
+<p><b>Or load from file: </b><input type="file" id="files1" name="files1" onchange='openFile1(event)'/><p>
+</td>
+<td width=40%><center>
+<textarea id="datos2" rows=18 cols=70 style="width:95%" wrap="off" placeholder="Type or paste object names here, or load from a file with the button below (not all browsers allow file upload)"></textarea>
+<p><b>Load from file: </b><input type="file" id="files2" name="files2" onchange='openFile2(event)'/><p>
+</td></tr></table>
+
+<td width=20%><p align=center><b><font size=4 color="red">Step 3: Run!</font><p align=center>
+<p align=center><button type="button" style="font: bold 20px Arial green" onclick="analyze()"><img src="img/play.png" height="80" width="80"/><br>Run</button></td>
+</td></tr></table>
+
+<center>
+<table width=100%><tr>
+<td width=100%><p align=center><b>Input your data above and click Run on the right.</b></td>
+</tr></table>
+</center>
+</div>
+
+<div id="resultsdiv" style="display:none">
+<p>
+<table bgcolor="#E0E0E0" width=100%>
+<tr><td align=center><table align=center><tr><td align=center><center>
+  <p align=center><h2>Result: Principal Components</h2></td></tr></table></td></tr>
+<tr><td>
+<table>
+<td width=100% valign="top">
+<p><b>Log:</b>
+<center>
+<p><textarea id="salida" rows=50 cols=50 style="width:95%" wrap="off" placeholder=""></textarea>
+</center>
+</td>
+<td>
+    <p><b>Plots:</b>
+    <p><div id="chart_div_1" style="width: 500px; height: 500px;"></div>
+    <p><div id="chart_div_2" style="width: 500px; height: 300px;"></div>
+    <p><div id="chart_div_3" style="width: 500px; height: 300px;"></div>
+    <p>
+</td>
+</tr></table>
+</td></tr></table>
+</div>
+
+<script type="text/javascript">
+
+    //For plots
+      var Combined1 = new Array();  //PCs
+      var Combined2 = new Array();  //Coefficients
+      var Combined3 = new Array();  //Eigenvalues
+      
+      //Matrices from U,S,V = SVD(X)
+      var mU = []
+      var mV = []
+
+      function analyze() {            
+        //Read in data and object names from textareas called datos1 and datos2...
+        var X = datatoarray(document.getElementById("datos1").value)  //...using an auxiliary function
+        var objectnames = document.getElementById("datos2").value.split("\n");  //...directly
+
+    //Create a Lalolab web worker for complex operations
+        var lab = new Lalolab("mylab",false,"./") ; // create a new Lalolab
+
+    //Transfer the X matrix into the lab space
+        lab.load(X, "X", function (result) {  // load the variable in the lab
+//          alert("The matrix " + laloprint(result,true) + " has been loaded in the lab.");
+        });
+        
+        var t0 = performance.now(); //Measure time
+        
+        //Run full Singular Value Decomposition in the lab web worker, put the result
+        //in an object called 'result', and once the SVD is done....
+        lab.do("svd(X',\"full\")", function ( result ) {
+          var t1 = performance.now() //... measure time again to compute how long the SVD took
+//          alert("SVD done in " + (t1 - t0) + " milliseconds.")
+          document.getElementById("salida").value = "SVD done in " + (t1 - t0) + " milliseconds."
+          
+          //These loops build arrays containing the U and V matrices for further handling
+          //from the matrix objects contained by result
+          for (i=0;i<result.U.m;i++)
+          {
+            var tmp=[];
+            for (j=0;j<result.U.n;j++)
+            {
+              tmp.push(result.U.val[i*result.U.n + j])
+            }
+            mU.push(tmp)
+          }
+          for (i=0;i<result.V.m;i++)
+          {
+            var tmp=[];
+            for (j=0;j<result.V.n;j++)
+            {
+              tmp.push(result.V.val[i*result.V.n + j])
+            }
+            mV.push(tmp)
+          }
+
+      //Report U, S and V
+          document.getElementById("salida").value = document.getElementById("salida").value + "\n\nU:\n\n" + mU.map(e => e.join(' ')).join('\n')  //This mapping results in a nicely formatted array for display
+          document.getElementById("salida").value = document.getElementById("salida").value + "\n\nS:\n\n" + result.s // s is just a vector so it gets displayed nicely
+          document.getElementById("salida").value = document.getElementById("salida").value + "\n\nV:\n\n" + mV.map(e => e.join(' ')).join('\n')   //This mapping results in a nicely formatted array for display
+
+      //Hide the HTML elements where we input data, and show those where we display results
+          document.getElementById('inputsdiv').style.display = 'none'
+          document.getElementById('resultsdiv').style.display = 'block';
+          document.getElementById('resultsdiv').scrollIntoView();
+
+      //Load Google Charts (note we do this only now, after all numbers to be plotted have been computed)
+          google.charts.load('current', {'packages':['corechart']});
+          google.charts.setOnLoadCallback(drawChart1);
+
+          function drawChart1() {
+            Combined1[0] = ['PC1', 'PC2', {type:'string', role:'tooltip'}, {type:'string', role:'style'}];
+            for (var i = 0; i < mU.length; i++){
+              switch(objectnames[i]) {
+                case 'obj1':
+                  thiscolor='#ff0000'
+                  break;
+                case 'obj2':
+                  thiscolor='#00ff00'
+                  break;
+                case 'obj3':
+                  thiscolor='#0000ff'
+                  break;
+              }
+              Combined1[i + 1] = [ mU[i][0], mU[i][1], objectnames[i], thiscolor ];
+            }
+            
+            Combined2[0] = ['Variable Index', 'Coeff. 1', 'Coeff. 2', 'Coeff. 3'];
+            for (var i = 0; i < mV.length; i++){
+              Combined2[i + 1] = [ i+1, mV[i][0], mV[i][1], mV[i][2] ];
+            }
+            
+            Combined3[0] = ['Principal Component', 'Eigenvalue'];
+            for (var i = 0; i < result.s.length; i++){
+              Combined3[i + 1] = [ i+1, result.s[i] ];
+            }
+            
+            //second parameter is false because first row is headers, not data.
+            var data1 = google.visualization.arrayToDataTable(Combined1, false);
+            var data2 = google.visualization.arrayToDataTable(Combined2, false);
+            var data3 = google.visualization.arrayToDataTable(Combined3, false);
+
+            var options1 = {
+              title: 'Principal Components Plot (one color per object type)',
+              hAxis: {title: 'PC1'},
+              vAxis: {title: 'PC2'},
+              legend: 'none',
+              explorer: {}
+            };
+
+            var options2 = {
+              title: 'Coefficients',
+              hAxis: {title: 'Variable Index'},
+              vAxis: {title: 'Coefficient'},
+              //legend: 'left',
+              legend: { position: 'bottom' },
+              explorer: {}
+            };
+
+            var options3 = {
+              title: 'Eigenvalues',
+              hAxis: {title: 'Coefficient'},
+              vAxis: {title: 'Eigenvalue'},
+              legend: 'none',
+              explorer: {}
+            };
+            
+            var chart1 = new google.visualization.ScatterChart(document.getElementById('chart_div_1'));
+            var chart2 = new google.visualization.LineChart(document.getElementById('chart_div_2'));
+            var chart3 = new google.visualization.ColumnChart(document.getElementById('chart_div_3'));
+
+            chart1.draw(data1, options1);
+            chart2.draw(data2, options2);
+            chart3.draw(data3, options3);
+          };
+        });
+      };
+
+  //read in text formatted as matrix and return an array
+  //uses intermediate conversion to string
+  function datatoarray(matrixastext)
+  {
+    var lineas = document.getElementById("datos1").value.split("\n");
+    var X = "["
+    for (i=0;i<lineas.length;i=i+1)
+    {
+      tmp = lineas[i].toString().trim()
+      tmp=tmp.replace(/\t/g," ")
+      tmp=tmp.replace(/        /g," ")
+      tmp=tmp.replace(/       /g," ")
+      tmp=tmp.replace(/      /g," ")
+      tmp=tmp.replace(/     /g," ")
+      tmp=tmp.replace(/    /g," ")
+      tmp=tmp.replace(/   /g," ")
+      tmp=tmp.replace(/  /g," ")
+      tmp=tmp.replace(/ /g,",")
+      X = X + "[" + tmp + "],"
+    }
+    X = X + "]"
+    X = X.replace("],]","]]")
+    return eval(X)
+  }
+
+  //load sample synthetic data with 3 classes of objects (7 of each), defined by 20 variables
+  //(so it is a 20 x 21 matrix in text format)
+  function load_sample_data()
+  {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", "data/syntheticdata2.txt", false);
+    rawFile.onreadystatechange = function ()
+    {
+      if(rawFile.readyState === 4)
+      {
+        if(rawFile.status === 200 || rawFile.status == 0)
+        {
+          datos1.value = rawFile.responseText;
+        }
+      }
+    }
+    rawFile.send(null);
+
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", "data/syntheticdatanames2.txt", false);
+    rawFile.onreadystatechange = function ()
+    {
+      if(rawFile.readyState === 4)
+      {
+        if(rawFile.status === 200 || rawFile.status == 0)
+        {
+          datos2.value = rawFile.responseText;
+        }
+      }
+    }
+    rawFile.send(null);
+  }
+
+  //http://http://www.javascripture.com/FileReader
+  var openFile1 = function(event) {
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      datos1.value=reader.result;
+    };
+    reader.readAsText(input.files[0]);
+  };
+
+  var openFile2 = function(event) {
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      var text = reader.result;
+      datos2.value=reader.result;
+    };
+    reader.readAsText(input.files[0]);
+  };
+
+</script>
+
+<p><br>
+<center>
+
+</body>
+</html>
