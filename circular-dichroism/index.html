@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html><title>Circular Dichroism Wizard</title>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    h1    {      font-family: Calibri;    }
+    p    {      font-family: Calibri;    }
+    table    {      font-family: Calibri;      margin: 0px;      border-spacing: 1px;      border-radius: 10px;    }
+    textarea    {      border-radius: 5px;    }
+    button    {      border-radius: 5px;    }
+  </style>
+</head>
+
+<body>
+
+<script type="text/javascript" src="js/cd2.js"></script>
+
+<center>
+<table width=100%><tr>
+  <td width=10% align=left>
+      <b><font size=4><a href="../" target="_blank">[JSinScience]</a></font></b>
+  </td>
+  <td width=90%><center><h1>Fit and Simulate protein CD spectra</h1></td>
+</tr></table>
+
+<p align="left">
+<font size=4 color="gray"><b>A HTML/JavaScript tool to fit and simulate circular dichroism spectra of proteins, rewritten into JavaScript from <a href="Abriata_CD_SI_program.xlsm" download>the Excel program</a> described in <a href="http://pubs.acs.org/doi/abs/10.1021/ed200060t" target="_blank">this article</a>.</b></font>
+<p>
+
+<div id="inputsdiv" style="display:block">
+  <table bgcolor="#F0F0F0" style="width:100%">
+    <tr><td valign=top>
+    <table width=100%>
+    <tr><td width=30%  valign=top><center>
+      <font color="red"><h3>Step 1: To fit an experimental spectrum, paste data in text format here</h3></font>
+      <textarea id="datos1" rows=12 cols=8 style="width:95%" wrap="off" placeholder="Copy-paste experimental CD data in text format here, first column has wavelengths and second has CD. If you leave this empty and click Run, you will be able to simulate spectra only."></textarea>
+      <p>
+      <b>Load from file: </b><input type="file" id="files1" name="files1" onchange='openFile1(event)'/>
+      <center><b><font size=4 color="black"><i>Sample data set:</b></i>
+      <font size=4 color="black"><button type="button" onclick="load_peptide1_final()" title="Click for example">Click for example</button>
+      <font color="red"><h3>Step 2: Click run for CD fits/simulations</h3></font>
+      <p>
+      <table>
+      <tr><td>
+      <button type="button" style="font: bold 20px Arial green" onclick="plotdata();simudata()"><img src="img/play.png" height="80" width="80"/><br>Run</button>
+      </td><td>
+      (If no experimental data are given, clicking Run allows simulations of CD spectra)
+      </td></tr></table>
+      </td>
+      </td>
+      
+      <td width=70%><center>
+        <div id="resultsdiv" style="display:none">
+          <table bgcolor="#E0E0E0" width=100%>
+            <tr>
+            <td align=center>
+            <font color="red">
+            <h3>Result: experimental and simulated CD spectra</h3></font>
+            </td></tr>
+            <tr><td>
+            <table width=100%>
+            <td width=70% valign=top>
+            <canvas id="myCanvas" width="600" height="500" style="border:1px solid #000000;"></canvas>
+            <p align="left">
+            <b>Notes:</b> Secondary structure contents from CD fits might have 10-20 % error...
+            <br>This tool is based on multilinear regression to reference spectra <a href="http://pubs.acs.org/doi/abs/10.1021/ed200060t" target="_blank">as explained here</a> but with javascript-only code
+            </td>
+            <td width=30% valign="top"><p align=center><b>Simulation controls</b>
+            <p align=center>Alpha coefficient... <input type="text" id="fraccionalfa" size="5" onchange="plotdata();simudata()" value=35></input> <button type="button" onclick="document.getElementById('fraccionalfa').value = parseFloat(document.getElementById('fraccionalfa').value) - 5;plotdata();simudata()"> - </button> <button type="button" onclick="document.getElementById('fraccionalfa').value = parseFloat(document.getElementById('fraccionalfa').value) + 5;plotdata();simudata()"> + </button>
+            <p align=center>Beta coefficient... <input type="text" id="fraccionbeta" size="5" onchange="plotdata();simudata()" value=35></input> <button type="button" onclick="document.getElementById('fraccionbeta').value = parseFloat(document.getElementById('fraccionbeta').value) - 5;plotdata();simudata()"> - </button> <button type="button" onclick="document.getElementById('fraccionbeta').value = parseFloat(document.getElementById('fraccionbeta').value) + 5;plotdata();simudata()"> + </button>
+            <p align=center>Turn coefficient... <input type="text" id="fraccionturn" size="5" onchange="plotdata();simudata()" value=10></input> <button type="button" onclick="document.getElementById('fraccionturn').value = parseFloat(document.getElementById('fraccionturn').value) - 5;plotdata();simudata()"> - </button> <button type="button" onclick="document.getElementById('fraccionturn').value = parseFloat(document.getElementById('fraccionturn').value) + 5;plotdata();simudata()"> + </button>
+            <p align=center>Random coil... <input type="text" id="fraccionrc" size="5" onchange="plotdata();simudata()" value=20></input> <button type="button" onclick="document.getElementById('fraccionrc').value = parseFloat(document.getElementById('fraccionrc').value) - 5;plotdata();simudata()"> - </button> <button type="button" onclick="document.getElementById('fraccionrc').value = parseFloat(document.getElementById('fraccionrc').value) + 5;plotdata();simudata()"> + </button>
+
+            <p align=center><button type="button" id="fraccionrc" size="5" onclick="tmpsuma=parseFloat(document.getElementById('fraccionalfa').value)+parseFloat(document.getElementById('fraccionbeta').value)+parseFloat(document.getElementById('fraccionturn').value)+parseFloat(document.getElementById('fraccionrc').value); document.getElementById('fraccionalfa').value=100*parseFloat(document.getElementById('fraccionalfa').value)/tmpsuma;document.getElementById('fraccionbeta').value=100*parseFloat(document.getElementById('fraccionbeta').value)/tmpsuma;document.getElementById('fraccionturn').value=100*parseFloat(document.getElementById('fraccionturn').value)/tmpsuma;document.getElementById('fraccionrc').value=100*parseFloat(document.getElementById('fraccionrc').value)/tmpsuma;plotdata();simudata()" value=20>Normalize</button>
+             (so that the coefficients become % of each secondary structure type)
+            <p align=center><input type="checkbox" id="myCheck" onclick="plotdata();simudata()" checked>Show reference spectra</button><br><i>(<font color="red">red for helix</font>, <font color="green">green for beta</font>, <font color="blue">blue for turn</font>, <font color="yellow">yellow for random coil</font>)</i>
+
+            <hr>
+            <p align=center><b>Fitting controls</b>
+            <p align=center>Fit range from <input type="text" id="fitrange1" size="5" onchange="plotdata();simudata()" value=200></input> <button type="button" onclick="document.getElementById('fitrange1').value = parseFloat(document.getElementById('fitrange1').value) - 5;plotdata();simudata()"> - </button> <button type="button" onclick="document.getElementById('fitrange1').value = parseFloat(document.getElementById('fitrange1').value) + 5;plotdata();simudata()"> + </button> <br>
+            ...to <input type="text" id="fitrange2" size="5" onchange="plotdata();simudata()" value=250></input> <button type="button" onclick="document.getElementById('fitrange2').value = parseFloat(document.getElementById('fitrange2').value) - 5;plotdata();simudata()"> - </button> <button type="button" onclick="document.getElementById('fitrange2').value = parseFloat(document.getElementById('fitrange2').value) + 5;plotdata();simudata()"> + </button>
+            <p align=center><button type="button" id="fit_anal" size="5" onclick="fit_anal_4();plotdata();simudata()" value=20>Fit 4 components</button><br>
+            <p align=center><button type="button" id="fit_anal" size="5" onclick="fit_anal_alfabetarc();plotdata();simudata()" value=20>Fit alpha, beta, coil</button><br>
+            <p align=center><button type="button" id="fit_anal" size="5" onclick="fit_anal_turnbetarc();plotdata();simudata()" value=20>Fit turn, beta, coil</button><br>
+
+            </tr></table>
+          </td></tr></table>
+        </div>
+
+      </td>
+    </tr></table>
+  </td></tr></table>
+</div>
+
+
+    <script type="text/javascript">
+       //http://http://www.javascripture.com/FileReader
+       var openFile1 = function(event) {
+          var input = event.target;
+ 
+          var reader = new FileReader();
+          reader.onload = function(){
+             datos1.value=reader.result;
+          };
+          reader.readAsText(input.files[0]);
+       };
+    </script>
+
+    <script type="text/javascript">
+       //http://http://www.javascripture.com/FileReader
+       var openFile2 = function(event) {
+          var input = event.target;
+ 
+          var reader = new FileReader();
+          reader.onload = function(){
+             var text = reader.result;
+             datos2.value=reader.result;
+          };
+          reader.readAsText(input.files[0]);
+       };
+    </script>
+
+    <script>
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+	x = Math.round((evt.clientX-rect.left)/(rect.right-rect.left)*canvas.width);
+	y = Math.round((evt.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height);
+	mousemotion(x,y)
+      }
+
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+
+      canvas.addEventListener('mousemove', function(evt) {
+        var mousePos = getMousePos(canvas, evt);
+      }, false);
+    </script>
+    
+<p><br>
+<center>
+
+</body>
+</html>

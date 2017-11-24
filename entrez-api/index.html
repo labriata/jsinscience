@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	    <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
+      <title>Text retrieval and analysis</title>
+      <style>
+          body {
+              color: #333;
+              background-color: #efefef;
+              font: 13px helvetica,arial,freesans,clean,sans-serif;
+          }
+      </style>
+  </head>
+  <body onload="analyzeabstracts('listitems','abstractsbyauthor');analyzeabstracts('listitems','abstractsbyprotein')">
+    <script src="js/textworks.js"></script>
+
+    <table width=100%><tr>
+      <td width=10% align=left>
+          <b><font size=4><a href="../" target="_blank">[JSinScience]</a></font></b>
+      </td>
+      <td width=90%><center><h1>Literature Reporter</h1></td>
+    </tr></table>
+<b><font size=4 color="gray">Retrieves recent abstracts from PubMed and performs simple analyses on them by using <a href="https://github.com/nlp-compromise/compromise" target="_blank">nlp-compromise</a>.</font></b>
+<p>
+
+    <table width="100%">
+      <!--tr>
+        <td width="50%">
+          <button type="button" onclick="analyzeabstracts('listitems','abstractsbyauthor')">Get abstracts by author</button>
+        </td>
+        <td width="50%">
+          <button type="button" onclick="analyzeabstracts('listitems','abstractsbyprotein')">Get abstracts by protein</button>
+        </td>
+      </tr-->
+      <tr>
+        <td width="50%" valign="top"> <p id="abstractsbyauthor"><b>Articles by 'L. Abriata' in last 18 months<br></b></p> </td>
+        <td width="50%" valign="top"> <p id="abstractsbyprotein"><b>Articles mentioning 'JavaScript' in the abstract in last 2 months<br></b></p> </td>
+      </tr>
+    </table>
+  </body>
+
+<p><br>
+<center>
+</html>

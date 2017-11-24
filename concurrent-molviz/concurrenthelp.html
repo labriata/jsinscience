@@ -1,0 +1,30 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    h2    {      font-family: Calibri;    }
+    h3    {      font-family: Calibri;    }
+    p    {      font-family: Calibri;    }
+    table    {      font-family: Calibri;    }
+  </style>
+</head>
+<body>
+<h2>Concurrent molecular visualizations in JSmol</h2>
+<font size=4 color='gray'><p>This tool allows two or more users to share a JSmol visualization on their devices, through the web.
+<p>JSmol commands and mouse rotations input by a user on his/her own visualization are transmitted in almost real time to the other devices. This way the users can look at the molecule in the same orientation, with the same settings.
+<p>The most important application would be when discussing projects at a distance. Since only commands and rotation states are transferred, the experience is much clearer than sharing screens on a standard communication program. Also, this web app can work on all directions, i.e. each user broadcasts commands and rotations to all other users at the same time.
+<p>Users can also text-chat and send each other files directly through this web page. (The technology itself allows also video and audio communication, but they are not implemented in this example).
+<p>
+</font><h3>How to</h3><font size=4 color='gray'>
+<p><b>Step 1</b> One of the users must copy the PeerJS ID found at the top left (this number is automatically generated each time the user loads the web page) and send it to the other users by whatever medium, such as an email.
+<p><b>Step 2</b> The other users must enter this ID in the "Connect to a peer" box and click on "Connect". A connection should be established.
+<p><b>Working:</b> Right under the molecule, there is a textbox where the user can type JSmol commands that will be applied to his/her visualization and also at the other users'. Commands typed through JSmol's console will not be transmitted!
+<p>Notice that if you need to apply commands on selections, it's best to type everything on one line, for example "select all;cartoon off". This might apply to other combinations of commands, too.
+<p>If the "Send rotations to peers" box is activated in one user's page, then his/her visualization's rotation state will be transmitted and applied to the other users' visualizations.
+<p>"Send rotations to peers" should be active in one user's visualization at a time.
+<p>Additional commands: You can chat by typing messages on the "Enter message" text box and hitting "Send message to peers".
+
+</font><h3>How does it work?</h3><font size=4 color='gray'>
+<p>This web app uses PeerJS to transmit data from and to web browsers. It was built by modifying the examples at (<a href="http://peerjs.com/" target="_blank">PeerJS's website</a>).
+</body>
+</html>

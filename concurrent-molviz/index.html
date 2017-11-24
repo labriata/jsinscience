@@ -1,0 +1,321 @@
+<!DOCTYPE HTML> 
+<html lang="en"> 
+<head>
+<title>Collaborative JSmol</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+<meta http-equiv="Content-Language" content="en-us"> 
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+<script>
+// Connect to PeerJS, have server assign an ID instead of providing one
+// Showing off some of the configs available with PeerJS :).
+var peer = new Peer({
+  // Set API key for cloud server (you don't need this if you're running your
+  // own.
+  key: 'x7fwx2kavpy6tj4i',
+
+  // Set highest debug level (log everything!).
+  debug: 3,
+
+  // Set a logging function:
+  logFunction: function() {
+    var copy = Array.prototype.slice.call(arguments).join(' ');
+    $('.log').append(copy + '<br>');
+  }
+});
+var connectedPeers = {};
+
+// Show this peer's ID.
+peer.on('open', function(id){
+  $('#pid').text(id);
+});
+
+// Await connections from others
+peer.on('connection', connect);
+
+peer.on('error', function(err) {
+  console.log(err);
+})
+
+// Handle a connection object.
+function connect(c) {
+  // Handle a chat connection.
+  if (c.label === 'chat') {
+    var chatbox = $('<div></div>').addClass('connection').addClass('active').attr('id', c.peer);
+    var header = $('<h3></h3>').html('Chat with <strong>' + c.peer + '</strong>');
+    var messages = $('<div><em>Peer connected.</em></div>').addClass('messages');
+    chatbox.append(header);
+    chatbox.append(messages);
+ 
+    // Select connection handler.
+    chatbox.on('click', function() {
+      if ($(this).attr('class').indexOf('active') === -1) {
+        $(this).addClass('active');
+      } else {
+        $(this).removeClass('active');
+      }
+    });
+    $('.filler').hide();
+    $('#connections').append(chatbox);
+
+    c.on('data', function(data) {
+      //Jmol.evaluateVar(jmolApplet0,"load('" + data + "')");
+      //Jmol.script(jmolApplet0,"load DATA '" + data + "'");
+      if (data.substr(0,1) == '{') {
+        Jmol.script(jmolApplet0,"moveto 0 quaternion " + data)
+      } else if (data.substr(0,7) == '#jsmol#') {
+        Jmol.script(jmolApplet0,data.replace('#jsmol#',''))
+		messages.append('<div><span class="peer">' + c.peer + '</span>: Applying script <i>' + data.replace('#jsmol#','') + '</i> sent by peer</div>');
+      } else {
+        messages.append('<div><span class="peer">' + c.peer + '</span>: ' + data + '</div>');
+      }
+    });
+
+        c.on('close', function() {
+          alert(c.peer + ' has left the chat.');
+          chatbox.remove();
+          if ($('.connection').length === 0) {
+            $('.filler').show();
+          }
+          delete connectedPeers[c.peer];
+        });
+  } else if (c.label === 'file') {
+    c.on('data', function(data) {
+      // If we're getting a file, create a URL for it.
+      if (data.constructor === ArrayBuffer) {
+        var dataView = new Uint8Array(data);
+        var dataBlob = new Blob([dataView]);
+        var url = window.URL.createObjectURL(dataBlob);
+        $('#' + c.peer).find('.messages').append('<div><span class="file">' +
+            c.peer + ' has sent you a <a target="_blank" href="' + url + '">file</a>.</span></div>');
+      }
+    });
+  }
+  connectedPeers[c.peer] = 1;
+}
+
+$(document).ready(function() {
+  // Prepare file drop box.
+  var box = $('#box');
+  box.on('dragenter', doNothing);
+  box.on('dragover', doNothing);
+  box.on('drop', function(e){
+    e.originalEvent.preventDefault();
+    var file = e.originalEvent.dataTransfer.files[0];
+    eachActiveConnection(function(c, $c) {
+      if (c.label === 'file') {
+        c.send(file);
+        $c.find('.messages').append('<div><span class="file">You sent a file.</span></div>');
+      }
+    });
+  });
+  function doNothing(e){
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // Connect to a peer
+  $('#connect').click(function() {
+    var requestedPeer = $('#rid').val();
+    if (!connectedPeers[requestedPeer]) {
+      // Create 2 connections, one labelled chat and another labelled file.
+      var c = peer.connect(requestedPeer, {
+        label: 'chat',
+        serialization: 'none',
+        metadata: {message: 'hi i want to chat with you!'}
+      });
+      c.on('open', function() {
+        connect(c);
+      });
+      c.on('error', function(err) { alert(err); });
+      var f = peer.connect(requestedPeer, { label: 'file', reliable: true });
+      f.on('open', function() {
+        connect(f);
+      });
+      f.on('error', function(err) { alert(err); });
+    }
+    connectedPeers[requestedPeer] = 1;
+  });
+
+  // Close a connection.
+  $('#close').click(function() {
+    eachActiveConnection(function(c) {
+      c.close();
+    });
+  });
+
+  // Send a chat message to all active connections.
+  $('#send').submit(function(e) {
+    e.preventDefault();
+    // For each active connection, send the message.
+    var msg = $('#text').val();
+    eachActiveConnection(function(c, $c) {
+      if (c.label === 'chat') {
+        c.send(msg);
+        $c.find('.messages').append('<div><span class="you">You: </span>' + msg
+          + '</div>');
+      }
+    });
+    $('#text').val('');
+    $('#text').focus();
+  });
+
+  $('#sendcommands').submit(function(e) {
+    e.preventDefault();
+    // For each active connection, send the message.
+    var msg = $('#textcommands').val();
+    Jmol.script(jmolApplet0, msg)
+    msg = "#jsmol#" + msg;
+    eachActiveConnection(function(c, $c) {
+      if (c.label === 'chat') {
+        c.send(msg);
+        $c.find('.messages').append('<div><span class="you">You: </span>' + msg + '</div>');
+      }
+    });
+    $('#textcommands').val('');
+    $('#textcommands').focus();
+  });
+
+  // Goes through each active peer and calls FN on its connections.
+  function eachActiveConnection(fn) {
+    var actives = $('.active');
+    var checkedIds = {};
+    actives.each(function() {
+      var peerId = $(this).attr('id');
+
+      if (!checkedIds[peerId]) {
+        var conns = peer.connections[peerId];
+        for (var i = 0, ii = conns.length; i < ii; i += 1) {
+          var conn = conns[i];
+          fn(conn, $(this));
+        }
+      }
+
+      checkedIds[peerId] = 1;
+    });
+  }
+
+  // Show browser version
+  $('#browsers').text(navigator.userAgent);
+  
+  setInterval(function(){
+    eachActiveConnection(function(c, $c) {
+      if (c.label === 'chat' && document.getElementById('chksendsignals').checked == true) {
+        //var msg=Math.random()
+        //var msg=Jmol.evaluateVar(jmolApplet0,"show('state')");
+        var msg=Jmol.evaluateVar(jmolApplet0,"show('rotation')");
+        c.send(msg);
+        if (data.substr(0,1) != '{') {
+          $c.find('.messages').append('<div><span class="you">You: </span>' + msg + '</div>');
+        }
+      }
+    });
+  }, 500);
+});
+
+// Make sure things clean up properly.
+
+window.onunload = window.onbeforeunload = function(e) {
+  if (!!peer && !peer.destroyed) {
+    peer.destroy();
+  }
+};
+
+var comando1="selectionHalos on; timeout 't1' -100 \'select all; label off; select on *.ca and within(8,sz = @{all.sz.min}); label %n%R; font label 18; color label black'"
+
+function runcommand(msg)
+{
+    Jmol.script(jmolApplet0, msg)
+    msg = "#jsmol#" + msg;
+    eachActiveConnection(function(c, $c) {
+      if (c.label === 'chat') {
+        c.send(msg);
+        $c.find('.messages').append('<div><span class="you">You: </span>' + msg + '</div>');
+      }
+    });
+}
+
+</script>
+        <script type="text/javascript" src="../_jsmol/JSmol.min.js"></script>
+        <script type="text/javascript">
+           Jmol._isAsync = false;
+           Jmol.getProfile() // records repeat calls to overridden or overloaded Java methods
+
+           var jmolApplet0; // set up with insertJSmol function below
+
+           jmol_isReady = function(applet) {
+            Jmol._getElement(applet, "appletdiv").style.border="0px"
+           }
+
+          Info0 = {
+            width: 700,
+            height: 500,
+            debug: false,
+            color: "#FFFFFF",
+            zIndexBase: 20000,
+            z:{monitorZIndex:100},
+            use: "HTML5",
+            j2sPath: "../_jsmol/j2s",
+            disableJ2SLoadMonitor: false,
+            disableInitialConsole: false,
+            readyFunction: jmol_isReady,
+            allowjavascript: true,
+    		script: "set antialiasDisplay;background white;load data/1ubq.pdb; zoom 100; wireframe 100; spacefill off; cartoon on; spin off; refresh; select (arg,lys); color blue; select (asp,glu); color red; select (cys,asn,gln,ser,thr,his,tyr); color green; select (ala,trp,ile,leu,met,pro,val,phe); color gray; select (pro); color black; spacefill 100; selectionHalos on; timeout 't1' -100 \'select all; label off; select on *.ca and within(8,sz = @{all.sz.min}); label %n%R; font label 18; color label black'"
+           }
+        </script>
+</head> 
+ 
+<body>
+<table width=100% border=1>
+<tr><td valign=top bgcolor="#F0F0F0">
+      <b><font size=4><a href="http://labriataphd.altervista.org/" target="_blank">[HOME]</a></font></b><br>
+      <b><font size=4><a href="index.html" target="_blank">[JSinScienceHOME]</a></font></b>  
+  <div id="actions">
+    <h2>Concurrent JSmol visualizations</h2>
+    <p><b>Your PeerJS ID is <span id="pid"></span></b> | <a href="concurrenthelp.html" onclick="window.open(this.href, 'mywin','left=20,top=20,width=500,height=500,toolbar=0,menubar=0,status=0,titlebar=0,scrollbars=1,resizable=0'); return false;"><b>Help and about this web app...</b></a>
+    <p>Connect to a peer: <input type="text" id="rid" placeholder="Someone else's id"><input class="button" type="button" value="Connect" id="connect">
+	<p><hr>
+    <form id="send">
+      <input type="text" id="text" placeholder="Enter message"><input class="button" type="submit" value="Send message to peers">
+    </form>
+    <button id="close">Close connections</button>
+  </div>
+
+  <div id="wrap"><div id="connections"><span class="filler"><table border=1>You have not yet made any connections.</table></span></div>
+
+  <hr><div id="box" style="background: #9ff; font-size: 18px;padding:10px 10px; text-align: center;">
+    Drag file here to send to active connections.
+  </div><hr>
+
+  <div class="clear"></div></div>
+
+</td>
+
+   <td valign=top><center><script>jmolApplet0 = Jmol.getApplet("jmolApplet0", Info0)</script>
+       <p><hr><p>
+       <form id="sendcommands">
+         <center>
+         <input type="text" id="textcommands" placeholder="Type JSmol commands and hit enter"> --> 
+         <input class="button" type="submit" value="Apply commands here and on peers' views">
+         <input type="checkbox" id="chksendsignals"><b>Send rotations to peers</b>
+         <p>
+         <input type="checkbox" id="chksendlabels" onclick="if (document.getElementById('chksendlabels').checked==true) { runcommand(comando1) } else { runcommand(comando2) }"><b>Show residue labels on top</b> 
+         <input type="checkbox" id="chksendspin" onclick="if (document.getElementById('chksendspin').checked==true) { runcommand('spin on') } else { runcommand('spin off') }"><b>Spin</b> 
+         <p>
+       </form>
+   </td>
+
+</tr></table>
+
+  <!--
+  <div class="warning browser">
+    <div class="important">Your browser version: <span id="browsers"></span><br>
+  -->
+
+<div class="log" style="color:#FF7500;text-shadow:none;padding:15px;background:#eee"><strong>Connection status</strong>:<br></div>
+</div>
+<p><br><p><br><p><br>
+<p align="left"><a href="https://clustrmaps.com/site/19vt3" title="Visit tracker"><img src="//www.clustrmaps.com/map_v2.png?d=OP5BuAn9SnZr9lY36X9o00bH507ho9TmFmviEobSVno&cl=ffffff" width="1%" geight="1%"></a>
+</body> 
+</html> 
