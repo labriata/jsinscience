@@ -20,7 +20,12 @@ Pure JavaScript implementation of the algorithm described in this
 
 ## [Entrez API](entrez-api/index.html)
 Very simple examples of retrieving records from PubMed from keywords and/or authors, using
-the [Entrez API](https://www.ncbi.nlm.nih.gov/home/develop/api/) services.
+the [Entrez API](https://www.ncbi.nlm.nih.gov/home/develop/api/) services. Further, it uses
+[nlp-compromise](https://github.com/nlp-compromise/compromise) to extract terms from the abstracts.
+
+
+## [Abstract Mutation Parser](mutation-parser/index.html)
+
 
 # Authors
 [Luciano Abriata](https://github.com/labriata)
