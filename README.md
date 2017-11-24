@@ -4,13 +4,20 @@ JavaScript is gaining traction in the scientific community as a simple and power
 to build engaging and interactive applications running only on the web browser. 
 
 This page is a repository of simple examples that attempt to illustrate the potential of 'web apps'.
+Click on the title of each example to see a live demo, or browse the repository for the code.
 
 # List of Examples
 
-## Principal Component Analysis
+## [Principal Component Analysis](pca/index.html)
 Implementation of PCA for simple inspection of similarities and differences among complex datasets. Uses
 the [LALOlib](http://mlweb.loria.fr/lalolab/lalolib.html) library for PCA and 
 [Google Charts API](https://developers.google.com/chart/) for plotting.
 
+## [Circular Dichroism of Proteins](circular-dichroism/index.html)
+Tool to fit and simulate circular dichroism spectra of proteins. 
+Pure JavaScript implementation of the algorithm described in this 
+[publication](http://pubs.acs.org/doi/abs/10.1021/ed200060t)
+
 # Authors
 [Luciano Abriata](https://github.com/labriata)
+Ported to GitHub by Joao Rodrigues (@joaorodrigues)
