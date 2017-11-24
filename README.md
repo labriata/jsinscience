@@ -18,7 +18,7 @@ Tool to fit and simulate circular dichroism spectra of proteins.
 Pure JavaScript implementation of the algorithm described in this 
 [publication](http://pubs.acs.org/doi/abs/10.1021/ed200060t)
 
-## [Entrez API](circular-dichroism/index.html)
+## [Entrez API](entrez-api/index.html)
 Very simple examples of retrieving records from PubMed from keywords and/or authors, using
 the [Entrez API](https://www.ncbi.nlm.nih.gov/home/develop/api/) services.
 
