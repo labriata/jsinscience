@@ -3,7 +3,7 @@
 JavaScript is gaining traction in the scientific community as a simple and powerful language
 to build engaging and interactive applications running only on the web browser. 
 
-[This page](labriata.github.io/jsinscience) is a repository of simple examples that attempt to illustrate the potential of 'web apps'.
+[This page](https://labriata.github.io/jsinscience) is a repository of simple examples that attempt to illustrate the potential of 'web apps'.
 Click on the title of each example to see a live demo, or browse the repository for the code.
 
 # List of Examples
