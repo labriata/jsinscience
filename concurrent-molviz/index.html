@@ -261,7 +261,7 @@ function runcommand(msg)
             disableInitialConsole: false,
             readyFunction: jmol_isReady,
             allowjavascript: true,
-    		script: "set antialiasDisplay;background white;load 1ubq.pdb; zoom 100; wireframe 100; spacefill off; cartoon on; spin off; refresh; select (arg,lys); color blue; select (asp,glu); color red; select (cys,asn,gln,ser,thr,his,tyr); color green; select (ala,trp,ile,leu,met,pro,val,phe); color gray; select (pro); color black; spacefill 100; selectionHalos on; timeout 't1' -100 \'select all; label off; select on *.ca and within(8,sz = @{all.sz.min}); label %n%R; font label 18; color label black'"
+    		script: "set antialiasDisplay;background white;load data/1ubq.pdb; zoom 100; wireframe 100; spacefill off; cartoon on; spin off; refresh; select (arg,lys); color blue; select (asp,glu); color red; select (cys,asn,gln,ser,thr,his,tyr); color green; select (ala,trp,ile,leu,met,pro,val,phe); color gray; select (pro); color black; spacefill 100; selectionHalos on; timeout 't1' -100 \'select all; label off; select on *.ca and within(8,sz = @{all.sz.min}); label %n%R; font label 18; color label black'"
            }
         </script>
 </head> 
