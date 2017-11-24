@@ -25,7 +25,8 @@ the [Entrez API](https://www.ncbi.nlm.nih.gov/home/develop/api/) services. Furth
 
 
 ## [Abstract Mutation Parser](mutation-parser/index.html)
-
+Another example of using the Entrez API to retrieve abstracts and analyzing them for specific 
+text patters, in this case mutations.
 
 # Authors
 [Luciano Abriata](https://github.com/labriata)

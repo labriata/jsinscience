@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	  <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
+      <title>Mine mutants at PubMed</title>
+      <style>
+          body {
+              color: #333;
+              background-color: #efefef;
+              font: 13px helvetica,arial,freesans,clean,sans-serif;
+          }
+      </style>
+  </head>
+  <body onload="analyzeabstracts('GB1','abstractsfound');">
+    <script src="js/minemutantspubmed.js"></script>
+
+    <table width=100%>
+      <tr>
+        <td width=10% align=left>
+          <b><font size=4><a href="../" target="_blank">[JSinScience]</a></font></b>
+        </td>
+        <td width=90%><center><h1>Mine mutations at PubMed</h1></td>
+      </tr>
+    </table>
+
+<b><font size=4 color="gray">Retrieves abstracts from PubMed containing "GB1" and extracts possible indications of mutations</font></b>
+<p>
+
+  <table width="100%">
+    <tr>
+      <td width="50%" valign="top"> <p id="abstractsfound"><b>Abstracts retrieved<br></b></p> </td>
+      <td width="50%" valign="top"> <p id="mutantresults"><b>Results from mining GB1 (wait while analyzing abstracts...) <br></b></p> </td>
+    </tr>
+  </table>
+</body>
+
+<p><br>
+<center>
+</html>
