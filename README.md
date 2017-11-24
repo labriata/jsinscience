@@ -28,6 +28,11 @@ the [Entrez API](https://www.ncbi.nlm.nih.gov/home/develop/api/) services. Furth
 Another example of using the Entrez API to retrieve abstracts and analyzing them for specific 
 text patters, in this case mutations.
 
+## [Augmented Reality Energy Calculation](arjs/index.html)
+An example of the use of Augmented Reality to drive the interaction of two amino acids, while a simple
+distance-dependent energy function is running in real-time. Uses [Three.js](https://threejs.org), 
+[A-Frame](https://aframe.io) and [AR.js](https://github.com/jeromeetienne/AR.js/).
+
 # Authors
 [Luciano Abriata](https://github.com/labriata)
 Ported to GitHub by Joao Rodrigues (@joaorodrigues)

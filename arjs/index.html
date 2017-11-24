@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<script src="js/aframe.min.js"></script>
+<script src="js/aframe-ar.js"></script>
+<script src="js/client.js"></script>
+  
+<html>
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+<style>
+  canvas  {	-moz-transform: scale(-1, 1);	-webkit-transform: scale(-1, 1);	-o-transform: scale(-1, 1);	-ms-transform: scale(-1, 1);	transform: scale(-1, 1);  }
+  video  {	-moz-transform: scale(-1, 1);	-webkit-transform: scale(-1, 1);	-o-transform: scale(-1, 1);	-ms-transform: scale(-1, 1);	transform: scale(-1, 1);  }
+</style>
+<div style='position: fixed; top: 10px; width:inherit; text-align: center; z-index: 1; background-color: rgba(255, 255, 255, 0.6);'>
+  <font size=4>
+  <p align=left><a href="https://clustrmaps.com/site/16ven" target="_blank"><img src="//www.clustrmaps.com/map_v2.png?d=WKH-KVfaTQVRp0prhtkOvyuUkN06NcEhV8jz6L6pKpk&cl=ffffff"  width="1%" height="1%" alt="" /></a><b>Move markers around for AR experience. (You need to print or load in phones <a href="markers.docx" download>these markers</a>)</b></p>
+  </font>
+  <font size=4 color=red><p id="infop" align=left></p></font>
+</div>
+	<a-scene embedded artoolkit='sourceType: webcam;' id="thescene">
+		<!-- handle hiro marker-->
+		<a-marker preset='hiro' id="lysmarker">
+          <!-- This is a lysine side chain, starting from the CA atom, which is set to the origin
+          All coordinates have been divided by 2,
+          so any distance between two atoms must be multiplied by 2 to get the actual distance-->
+          <a-sphere id="lysC1" position="0.000   0.000   0.000" color="grey" radius="0.4" geometry="buffer: false; skipCache: true"></a-sphere>
+          <a-sphere id="lysC2" position="-0.6035  -0.3175  -0.347" color="grey" radius="0.4" geometry="buffer: false; skipCache: true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysC3" position="-1.2480  -0.037  -0.0455" color="grey" radius="0.4" geometry="buffer: false; skipCache: true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysC4" position="-1.851  -0.3545  -0.3925" color="grey" radius="0.4" geometry="buffer: false; skipCache: true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysC5" position="-2.496  -0.0745  -0.0905" color="grey" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysN1" position="-3.075  -0.3795  -0.4235" color="blue" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH1" position="-0.5875 -0.2035 -0.88" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH2" position="-0.5895 -0.858 -0.2765" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH3" position="-1.264 -0.1515 0.4875" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH4" position="-1.2615 0.503 -0.1155" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH5" position="-1.8355 -0.2405 -0.925" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH6" position="-1.8375 -0.895 -0.322" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH7" position="-2.5115 -0.1885 0.442" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH8" position="-2.5095 0.466 -0.161" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH9" position="-3.057 -0.8825 -0.3935" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH10" position="-3.507 -0.202 -0.233" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+          <a-sphere id="lysH11" position="-2.9455  -0.524  -0.89" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #lysC1"></a-sphere>
+		</a-marker>
+		
+		<!-- handle kanji marker -->
+		<a-marker preset='kanji' id="glumarker">
+          <!-- This is a glutamate side chain, starting from the CA atom, which is set to the origin-->
+          <a-sphere id="gluC1" position="0.000   0.000   0.000" color="grey" radius="0.4" geometry="buffer: false; skipCache: true"></a-sphere>
+          <a-sphere id="gluC2" position="-0.6365 -0.3515 -0.238" color="grey" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluC3" position="-1.2485 0.0445 -0.006" color="grey" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluC4" position="-1.8755 -0.3015 -0.2405" color="grey" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluO1" position="-1.836 -0.8175 -0.563" color="red" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluO2" position="-2.4215 -0.066 -0.1075" color="red" radius="0.4" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluH1" position="-0.635 -0.381 -0.7825" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluH2" position="-0.6555 -0.854 -0.0285" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluH3" position="-1.25 0.0745 0.538" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+          <a-sphere id="gluH4" position="-1.2295 0.5475 -0.2155" color="white" radius="0.2" geometry="buffer: false; skipCache true; mergeTo: #gluC1"></a-sphere>
+		</a-marker>
+
+        <!-- Connecting charged atoms -->
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.1"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.2"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.3"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.4"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.5"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.6"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.7"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.8"></a-sphere>
+        <a-sphere radius="0.05" color="yellow" connector="src: #lysN1; dest: #gluO2; alpha: 0.9"></a-sphere>
+      
+		<!-- add a simple camera -->
+  	    <a-entity camera></a-entity>
+	</a-scene>
+</body>
+
+<script type="text/javascript">
+    setInterval(function(){
+		document.getElementById("thescene").object3D.updateMatrixWorld();
+        var p1 = new THREE.Vector3(); p1.setFromMatrixPosition(document.getElementById("lysN1").object3D.matrixWorld);
+        var p2 = new THREE.Vector3(); p2.setFromMatrixPosition(document.getElementById("gluO1").object3D.matrixWorld);
+        var p3 = new THREE.Vector3(); p3.setFromMatrixPosition(document.getElementById("gluO2").object3D.matrixWorld);
+		distNO1 = 2 * Math.sqrt( Math.pow(p2.x-p1.x,2) + Math.pow(p2.y-p1.y,2) + Math.pow(p2.z-p1.z,2) )        
+		distNO2 = 2 * Math.sqrt( Math.pow(p3.x-p1.x,2) + Math.pow(p3.y-p1.y,2) + Math.pow(p3.z-p1.z,2) )        
+		document.getElementById("infop").innerHTML="<p align='left'>N-O1 distance: " + distNO1 + " &#8491<br>N-O2 distance: " + distNO2 + " &#8491<br>Electrostatics: " + (-1/distNO1/distNO1 - 1/distNO2/distNO2) + "</p>";        
+    }, 100);
+</script>
+
+</html>
