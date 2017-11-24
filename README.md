@@ -37,6 +37,10 @@ Another example of Augmented Reality to perform interactive docking, integrating
 activate/deactivate a force field to highlight certain interactions. Uses [annyang](https://www.talater.com/annyang/)
 for voice recognition.
 
+## [Molecular Viewer with Gaze Tracking ](webgazer/index.html)
+Example of integration of gaze tracking and a molecular viewer. Uses [WebGazer.js](http://webgazer.cs.brown.edu/) to
+track the user's eyes and [JSmol](http://jmol.sourceforge.net) to display the molecule.
+
 # Authors
 [Luciano Abriata](https://github.com/labriata)
 Ported to GitHub by Joao Rodrigues (@joaorodrigues)
