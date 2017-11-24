@@ -43,4 +43,4 @@ track the user's eyes and [JSmol](http://jmol.sourceforge.net) to display the mo
 
 # Authors
 [Luciano Abriata](https://github.com/labriata)
-Ported to GitHub by Joao Rodrigues (@joaorodrigues)
+Ported to GitHub by Joao Rodrigues (`@joaorodrigues`)
