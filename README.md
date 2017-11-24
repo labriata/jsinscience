@@ -41,6 +41,9 @@ for voice recognition.
 Example of integration of gaze tracking and a molecular viewer. Uses [WebGazer.js](http://webgazer.cs.brown.edu/) to
 track the user's eyes and [JSmol](http://jmol.sourceforge.net) to display the molecule.
 
+# Code
+The code for these examples is available at [the repository](http://github.com/labriata/jsinscience).
+
 # Authors
 [Luciano Abriata](https://github.com/labriata)
 Ported to GitHub by [Joao Rodrigues](https://github.com/JoaoRodrigues)
