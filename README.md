@@ -50,4 +50,5 @@ The code for these examples is available at [the repository](http://github.com/l
 
 # Authors
 [Luciano Abriata](https://github.com/labriata)
+
 Ported to GitHub by [Joao Rodrigues](https://github.com/JoaoRodrigues)
